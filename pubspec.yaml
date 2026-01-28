@@ -23,6 +23,7 @@ dependencies:
   get_it: ^7.6.7
   injectable: ^2.4.2
   intl: ^0.20.2
+  google_fonts: ^6.1.0
 
 dev_dependencies:
   build_runner: ^2.4.5

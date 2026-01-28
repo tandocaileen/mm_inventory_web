@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:mm_inventory_web/ui/common/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TAppTheme {
   TAppTheme._();
@@ -10,6 +11,7 @@ class TAppTheme {
     brightness: Brightness.light,
     primaryColor: kcPrimaryColor,
     scaffoldBackgroundColor: kcBackgroundColor,
+    textTheme: GoogleFonts.montserratTextTheme(),
     cardTheme: CardThemeData(
       color: Colors.white,
       shadowColor: kcPrimaryColor.withAlpha(30),
@@ -25,7 +27,9 @@ class TAppTheme {
     brightness: Brightness.dark,
     primaryColor: kcPrimaryColor,
     scaffoldBackgroundColor: kcDarkGreyColor,
+    textTheme: GoogleFonts.montserratTextTheme(ThemeData.dark().textTheme),
     cardTheme: CardThemeData(
+      surfaceTintColor: kcPrimaryColor.withAlpha(20),
       color: kcDarkGreyColor.withAlpha(200),
       shadowColor: kcPrimaryColor.withAlpha(50),
       elevation: 4,
@@ -36,12 +40,13 @@ class TAppTheme {
   );
 
   static SfDataGridThemeData dataGridTheme = SfDataGridThemeData(
-    headerColor: kcMediumGrey.withAlpha(30), // Subtle background for headers
     gridLineColor:
         kcLightGrey.withAlpha(100), // Lighter, less prominent grid lines
     gridLineStrokeWidth: 0.3, // Thinner grid lines
-    headerHoverColor:
+    headerColor:
         kcPrimaryColor.withAlpha(20), // Subtle purple tint on header hover
+    headerHoverColor:
+        kcPrimaryColor.withAlpha(100), // Subtle purple tint on header hover
     rowHoverColor:
         kcPrimaryColor.withAlpha(10), // Very subtle purple tint on row hover
     selectionColor:

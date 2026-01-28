@@ -122,7 +122,7 @@ class CustomDataSource extends DataGridSource {
     // Fallback to empty map if not found (shouldn't happen in normal operation)
     final effectiveRowData = rowData ?? {};
 
-    const Color rowColor = kcVeryLightGrey;
+    const Color rowColor = kcWhiteColor;
 
     return DataGridRowAdapter(
       color: rowColor,

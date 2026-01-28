@@ -17,11 +17,11 @@ class Header extends StackedView<HeaderModel> {
       title: const Text(
         'MM Inventory Web',
         style: TextStyle(
-          color: kcPrimaryColor,
+          color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: kcPrimaryColor,
       elevation: 1,
       centerTitle: true,
     );

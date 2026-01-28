@@ -239,10 +239,10 @@ class _DashboardViewTabletContentState
                         columns: const [
                           'SKU',
                           'Product Name',
-                          'Scanned In',
-                          'Scanned Out',
                           'Start of Day',
                           'Current/End of Day',
+                          'Scanned In',
+                          'Scanned Out',
                         ],
                         shrinkWrapRows: false,
                         expandToFillSpace: true,
