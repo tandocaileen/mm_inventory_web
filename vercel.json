@@ -1,9 +1,4 @@
 {
-    "github": {
-        "silent": true
-    },
-    "buildCommand": "flutter build web --release",
-    "outputDirectory": "build/web",
     "cleanUrls": true,
     "trailingSlash": false,
     "headers": [
