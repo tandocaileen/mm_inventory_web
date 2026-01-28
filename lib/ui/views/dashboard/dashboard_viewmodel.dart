@@ -20,6 +20,7 @@ class DashboardViewModel extends BaseViewModel {
   List<Inventory> inventoryList = [];
   final TextEditingController dateController = TextEditingController();
   DateTime? lastApiCallTime;
+  bool _isLoading = false;
 
   Future<void> init() async {
     dateController.text = DateFormatter.formatForApi(selectedDate);
@@ -27,6 +28,9 @@ class DashboardViewModel extends BaseViewModel {
   }
 
   Future<void> loadData() async {
+    if (_isLoading) return; // Prevent concurrent calls
+
+    _isLoading = true;
     setBusy(true);
     try {
       dashboardDetails = await inventoryService.getDashboardDetails(
@@ -39,15 +43,16 @@ class DashboardViewModel extends BaseViewModel {
       dashboardDetails = null;
       inventoryList = [];
     } finally {
+      _isLoading = false;
       setBusy(false);
     }
   }
 
-  void onDateChanged(DateTime? date) {
+  Future<void> onDateChanged(DateTime? date) async {
     if (date != null) {
       selectedDate = date;
       dateController.text = DateFormatter.formatForApi(date);
-      loadData();
+      await loadData();
     }
   }
 
