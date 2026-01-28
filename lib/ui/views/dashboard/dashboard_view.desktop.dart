@@ -8,12 +8,22 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:stacked/stacked.dart';
 
 import 'dashboard_viewmodel.dart';
+import 'dashboard_view.tablet.dart';
 
 class DashboardViewDesktop extends ViewModelWidget<DashboardViewModel> {
   const DashboardViewDesktop({super.key});
 
   @override
   Widget build(BuildContext context, DashboardViewModel viewModel) {
+    final size = MediaQuery.of(context).size;
+    final isPortrait = size.height > size.width;
+
+    // If device is in portrait mode (weird phone ratios), use tablet layout
+    if (isPortrait) {
+      return const DashboardViewTablet();
+    }
+
+    // Otherwise use normal desktop layout
     return _DashboardViewDesktopContent(viewModel: viewModel);
   }
 }
