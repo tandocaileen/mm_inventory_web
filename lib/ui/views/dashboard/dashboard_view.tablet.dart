@@ -30,13 +30,11 @@ class _DashboardViewTabletContent extends StatefulWidget {
 
 class _DashboardViewTabletContentState
     extends State<_DashboardViewTabletContent> {
-  bool _showLegend = true;
-
   @override
   Widget build(BuildContext context) {
     return TabletLayout(
       isLoading: widget.viewModel.isBusy,
-      isScrollable: false,
+      isScrollable: true,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -45,7 +43,7 @@ class _DashboardViewTabletContentState
             // Title
             Text(
               'Inventory for ${widget.viewModel.selectedDate.toLocal().toString().split(' ')[0]} (Last updated: ${widget.viewModel.getLastApiCallTimeFormatted()})',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: kcPrimaryColor,
                   ),
@@ -53,38 +51,18 @@ class _DashboardViewTabletContentState
             verticalSpace(16.0),
 
             // Date Picker
-            Align(
-              alignment: Alignment.centerRight,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    onPressed: () => setState(() => _showLegend = !_showLegend),
-                    icon: Icon(
-                        _showLegend ? Icons.visibility_off : Icons.visibility),
-                    tooltip: _showLegend ? 'Hide Legend' : 'Show Legend',
-                    iconSize: 20,
-                    color: kcMediumGrey,
-                  ),
-                  horizontalSpaceSmall,
-                  SizedBox(
-                    width: 200,
-                    child: CustomField(
-                      label: 'Select Date',
-                      formType: FormType.datetime,
-                      controller: widget.viewModel.dateController,
-                      initialDate: widget.viewModel.selectedDate,
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime.now(),
-                      onDateTimeChanged: widget.viewModel.onDateChanged,
-                    ),
-                  ),
-                ],
-              ),
+            CustomField(
+              label: 'Select Date',
+              formType: FormType.datetime,
+              controller: widget.viewModel.dateController,
+              initialDate: widget.viewModel.selectedDate,
+              firstDate: DateTime(2020),
+              lastDate: DateTime.now(),
+              onDateTimeChanged: widget.viewModel.onDateChanged,
             ),
             verticalSpace(16.0),
 
-            // Pie Chart
+            // Pie Charts
             Card(
               elevation: 4,
               child: Padding(
@@ -93,20 +71,22 @@ class _DashboardViewTabletContentState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Product Inventory',
+                      'Start of Day Inventory',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                     ),
                     verticalSpace(16.0),
                     SizedBox(
-                      height: 250,
+                      height: 180,
                       child: Builder(
                         builder: (context) {
-                          final chartData = widget.viewModel.getChartData();
-                          final hasData = chartData != null &&
-                              chartData.isNotEmpty &&
-                              chartData.any((data) => data.value > 0);
+                          final series =
+                              widget.viewModel.getStartOfDayPieSeries();
+                          final hasData = series.isNotEmpty &&
+                              series.first.dataSource!.isNotEmpty &&
+                              series.first.dataSource!
+                                  .any((data) => data.value > 0);
 
                           if (!hasData) {
                             return Center(
@@ -114,13 +94,13 @@ class _DashboardViewTabletContentState
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   const Icon(Icons.inventory_2_outlined,
-                                      size: 48, color: kcMediumGrey),
+                                      size: 32, color: kcMediumGrey),
                                   verticalSpaceSmall,
                                   Text(
-                                    'Empty inventory for the selected date',
+                                    'No start of day inventory',
                                     style: Theme.of(context)
                                         .textTheme
-                                        .bodyLarge
+                                        .bodyMedium
                                         ?.copyWith(
                                           color: kcMediumGrey,
                                           fontWeight: FontWeight.w500,
@@ -132,19 +112,87 @@ class _DashboardViewTabletContentState
                             );
                           }
 
-                          return SfCartesianChart(
-                            primaryXAxis: const CategoryAxis(
-                              labelRotation: 0,
-                              labelStyle: TextStyle(fontSize: 12),
-                            ),
-                            primaryYAxis: const NumericAxis(
-                              labelFormat: '{value}',
-                            ),
-                            series: widget.viewModel.getStackedBarSeries(),
-                            legend: Legend(
-                              isVisible: _showLegend,
+                          return SfCircularChart(
+                            series: series,
+                            legend: const Legend(
+                              isVisible: false,
                               position: LegendPosition.bottom,
                               overflowMode: LegendItemOverflowMode.wrap,
+                              textStyle: TextStyle(fontSize: 10),
+                            ),
+                            tooltipBehavior: TooltipBehavior(enable: true),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            verticalSpaceMedium,
+            // Current/End of Day Pie Chart
+            Card(
+              elevation: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.viewModel.dashboardDetails?.isToday == true
+                          ? 'Current Inventory'
+                          : 'End of Day Inventory',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    verticalSpace(16.0),
+                    SizedBox(
+                      height: 180,
+                      child: Builder(
+                        builder: (context) {
+                          final series =
+                              widget.viewModel.getCurrentEndOfDayPieSeries();
+                          final hasData = series.isNotEmpty &&
+                              series.first.dataSource!.isNotEmpty &&
+                              series.first.dataSource!
+                                  .any((data) => data.value > 0);
+
+                          if (!hasData) {
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.inventory_2_outlined,
+                                      size: 32, color: kcMediumGrey),
+                                  verticalSpaceSmall,
+                                  Text(
+                                    widget.viewModel.dashboardDetails
+                                                ?.isToday ==
+                                            true
+                                        ? 'No current inventory'
+                                        : 'No end of day inventory',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: kcMediumGrey,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          return SfCircularChart(
+                            series: series,
+                            legend: const Legend(
+                              isVisible: false,
+                              position: LegendPosition.bottom,
+                              overflowMode: LegendItemOverflowMode.wrap,
+                              textStyle: TextStyle(fontSize: 10),
                             ),
                             tooltipBehavior: TooltipBehavior(enable: true),
                           );
@@ -158,49 +206,49 @@ class _DashboardViewTabletContentState
             verticalSpace(16.0),
 
             // Products Table
-            Flexible(
-              child: Card(
-                elevation: 4,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'Products',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                          ),
-                          IconButton(
-                            onPressed: widget.viewModel.loadData,
-                            icon: const Icon(Icons.refresh),
-                            tooltip: 'Reload Data',
-                            color: kcPrimaryColor,
-                          ),
-                        ],
-                      ),
-                      verticalSpace(16.0),
-                      Expanded(
-                        child: CustomTable(
-                          data: widget.viewModel.getTableData(),
-                          columns: const [
-                            'SKU',
-                            'Product Name',
-                            'Start of Day',
-                            'Current/End of Day',
-                          ],
-                          shrinkWrapRows: false,
-                          expandToFillSpace: true,
+            Card(
+              elevation: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          'Products',
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
+                        IconButton(
+                          onPressed: widget.viewModel.loadData,
+                          icon: const Icon(Icons.refresh),
+                          tooltip: 'Reload Data',
+                          color: kcPrimaryColor,
+                        ),
+                      ],
+                    ),
+                    verticalSpace(16.0),
+                    //TODO: fix height issue
+                    SizedBox(
+                      height: 800,
+                      child: CustomTable(
+                        data: widget.viewModel.getTableData(),
+                        columns: const [
+                          'SKU',
+                          'Product Name',
+                          'Scanned In',
+                          'Scanned Out',
+                          'Start of Day',
+                          'Current/End of Day',
+                        ],
+                        shrinkWrapRows: false,
+                        expandToFillSpace: true,
                       ),
-                    ],
-                  ),
+                    )
+                  ],
                 ),
               ),
             ),
