@@ -30,8 +30,6 @@ class _DashboardViewDesktopContent extends StatefulWidget {
 
 class _DashboardViewDesktopContentState
     extends State<_DashboardViewDesktopContent> {
-  bool _showLegend = false;
-
   @override
   Widget build(BuildContext context) {
     return DesktopLayout(
@@ -71,106 +69,186 @@ class _DashboardViewDesktopContentState
             ),
             horizontalSpaceMedium,
 
-            // Pie Chart and Table Row
+            // Pie Charts and Table Row
             Flexible(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Pie Chart
+                  // Pie Charts Column
                   Expanded(
                     flex: 1,
-                    child: Card(
-                      elevation: 4,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  'Product Inventory',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.bold,
+                    child: Column(
+                      children: [
+                        // Start of Day Pie Chart
+                        Expanded(
+                          child: Card(
+                            elevation: 4,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Start of Day Inventory',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                       ),
-                                ),
-                                const Spacer(),
-                                IconButton(
-                                  onPressed: () => setState(
-                                      () => _showLegend = !_showLegend),
-                                  icon: Icon(_showLegend
-                                      ? Icons.visibility_off
-                                      : Icons.visibility),
-                                  tooltip: _showLegend
-                                      ? 'Hide Legend'
-                                      : 'Show Legend',
-                                  iconSize: 20,
-                                  color: kcMediumGrey,
-                                ),
-                              ],
-                            ),
-                            verticalSpace(16.0),
-                            Expanded(
-                              child: Builder(
-                                builder: (context) {
-                                  final chartData =
-                                      widget.viewModel.getChartData();
-                                  final hasData = chartData != null &&
-                                      chartData.isNotEmpty &&
-                                      chartData.any((data) => data.value > 0);
+                                    ],
+                                  ),
+                                  verticalSpace(16.0),
+                                  Expanded(
+                                    child: Builder(
+                                      builder: (context) {
+                                        final series = widget.viewModel
+                                            .getStartOfDayPieSeries();
+                                        final hasData = series.isNotEmpty &&
+                                            series
+                                                .first.dataSource!.isNotEmpty &&
+                                            series.first.dataSource!
+                                                .any((data) => data.value > 0);
 
-                                  if (!hasData) {
-                                    return Center(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          const Icon(Icons.inventory_2_outlined,
-                                              size: 48, color: kcMediumGrey),
-                                          verticalSpaceSmall,
-                                          Text(
-                                            'Empty inventory for the selected date',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyLarge
-                                                ?.copyWith(
-                                                  color: kcMediumGrey,
-                                                  fontWeight: FontWeight.w500,
+                                        if (!hasData) {
+                                          return Center(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                const Icon(
+                                                    Icons.inventory_2_outlined,
+                                                    size: 48,
+                                                    color: kcMediumGrey),
+                                                verticalSpaceSmall,
+                                                Text(
+                                                  'No start of day inventory',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyLarge
+                                                      ?.copyWith(
+                                                        color: kcMediumGrey,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                  textAlign: TextAlign.center,
                                                 ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }
+                                              ],
+                                            ),
+                                          );
+                                        }
 
-                                  return SfCartesianChart(
-                                    primaryXAxis: const CategoryAxis(
-                                      labelRotation: 0,
-                                      labelStyle: TextStyle(fontSize: 12),
+                                        return SfCircularChart(
+                                          series: series,
+                                          legend: const Legend(
+                                            isVisible: false,
+                                            position: LegendPosition.bottom,
+                                            overflowMode:
+                                                LegendItemOverflowMode.wrap,
+                                          ),
+                                          tooltipBehavior:
+                                              TooltipBehavior(enable: true),
+                                        );
+                                      },
                                     ),
-                                    primaryYAxis: const NumericAxis(
-                                      labelFormat: '{value}',
-                                    ),
-                                    series:
-                                        widget.viewModel.getStackedBarSeries(),
-                                    legend: Legend(
-                                      isVisible: _showLegend,
-                                      position: LegendPosition.bottom,
-                                      overflowMode: LegendItemOverflowMode.wrap,
-                                    ),
-                                    tooltipBehavior:
-                                        TooltipBehavior(enable: true),
-                                  );
-                                },
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+                        verticalSpaceMedium,
+                        // Current/End of Day Pie Chart
+                        Expanded(
+                          child: Card(
+                            elevation: 4,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.viewModel.dashboardDetails
+                                                ?.isToday ==
+                                            true
+                                        ? 'Current Inventory'
+                                        : 'End of Day Inventory',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                  verticalSpace(16.0),
+                                  Expanded(
+                                    child: Builder(
+                                      builder: (context) {
+                                        final series = widget.viewModel
+                                            .getCurrentEndOfDayPieSeries();
+                                        final hasData = series.isNotEmpty &&
+                                            series
+                                                .first.dataSource!.isNotEmpty &&
+                                            series.first.dataSource!
+                                                .any((data) => data.value > 0);
+
+                                        if (!hasData) {
+                                          return Center(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                const Icon(
+                                                    Icons.inventory_2_outlined,
+                                                    size: 48,
+                                                    color: kcMediumGrey),
+                                                verticalSpaceSmall,
+                                                Text(
+                                                  widget
+                                                              .viewModel
+                                                              .dashboardDetails
+                                                              ?.isToday ==
+                                                          true
+                                                      ? 'No current inventory'
+                                                      : 'No end of day inventory',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyLarge
+                                                      ?.copyWith(
+                                                        color: kcMediumGrey,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }
+
+                                        return SfCircularChart(
+                                          series: series,
+                                          legend: const Legend(
+                                            isVisible: false,
+                                            position: LegendPosition.bottom,
+                                            overflowMode:
+                                                LegendItemOverflowMode.wrap,
+                                          ),
+                                          tooltipBehavior:
+                                              TooltipBehavior(enable: true),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   horizontalSpaceMedium,
