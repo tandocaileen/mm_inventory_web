@@ -99,6 +99,80 @@ class DashboardViewModel extends BaseViewModel {
     return series;
   }
 
+  // Pie chart data for Start of Day
+  List<PieSeries<ChartData, String>> getStartOfDayPieSeries() {
+    if (dashboardDetails == null) return [];
+
+    final chartData = dashboardDetails!.products
+        .where((product) => product.startOfDayCount > 0)
+        .map((product) {
+      final index = dashboardDetails!.products.indexOf(product);
+      return ChartData(
+        product.productName,
+        product.startOfDayCount.toDouble(),
+        color: _generateDistinctColor(index, dashboardDetails!.products.length),
+      );
+    }).toList();
+
+    if (chartData.isEmpty) return [];
+
+    return [
+      PieSeries<ChartData, String>(
+        dataSource: chartData,
+        xValueMapper: (ChartData data, _) => data.category,
+        yValueMapper: (ChartData data, _) => data.value,
+        dataLabelMapper: (ChartData data, _) =>
+            '${data.category}: ${data.value.toInt()}',
+        pointColorMapper: (ChartData data, _) => data.color,
+        dataLabelSettings: const DataLabelSettings(
+          isVisible: true,
+          labelPosition: ChartDataLabelPosition.outside,
+          textStyle: TextStyle(fontSize: 12),
+        ),
+      ),
+    ];
+  }
+
+  // Pie chart data for Current/End of Day
+  List<PieSeries<ChartData, String>> getCurrentEndOfDayPieSeries() {
+    if (dashboardDetails == null) return [];
+
+    final chartData = dashboardDetails!.products.where((product) {
+      final count = dashboardDetails!.isToday
+          ? (product.currentCount ?? 0)
+          : (product.endOfDayCount ?? 0);
+      return count > 0;
+    }).map((product) {
+      final index = dashboardDetails!.products.indexOf(product);
+      final count = dashboardDetails!.isToday
+          ? (product.currentCount ?? 0)
+          : (product.endOfDayCount ?? 0);
+      return ChartData(
+        product.productName,
+        count.toDouble(),
+        color: _generateDistinctColor(index, dashboardDetails!.products.length),
+      );
+    }).toList();
+
+    if (chartData.isEmpty) return [];
+
+    return [
+      PieSeries<ChartData, String>(
+        dataSource: chartData,
+        xValueMapper: (ChartData data, _) => data.category,
+        yValueMapper: (ChartData data, _) => data.value,
+        dataLabelMapper: (ChartData data, _) =>
+            '${data.category}: ${data.value.toInt()}',
+        pointColorMapper: (ChartData data, _) => data.color,
+        dataLabelSettings: const DataLabelSettings(
+          isVisible: true,
+          labelPosition: ChartDataLabelPosition.outside,
+          textStyle: TextStyle(fontSize: 12),
+        ),
+      ),
+    ];
+  }
+
   // Generate distinct colors for any number of items using HSL color space
   Color _generateDistinctColor(int index, int totalItems) {
     // Use golden angle approximation for better color distribution
