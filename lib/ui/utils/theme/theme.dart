@@ -10,6 +10,14 @@ class TAppTheme {
     brightness: Brightness.light,
     primaryColor: kcPrimaryColor,
     scaffoldBackgroundColor: kcBackgroundColor,
+    cardTheme: CardThemeData(
+      color: Colors.white,
+      shadowColor: kcPrimaryColor.withAlpha(30),
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    ),
   );
 
   static ThemeData darkTheme = ThemeData(
@@ -17,6 +25,14 @@ class TAppTheme {
     brightness: Brightness.dark,
     primaryColor: kcPrimaryColor,
     scaffoldBackgroundColor: kcDarkGreyColor,
+    cardTheme: CardThemeData(
+      color: kcDarkGreyColor.withAlpha(200),
+      shadowColor: kcPrimaryColor.withAlpha(50),
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    ),
   );
 
   static SfDataGridThemeData dataGridTheme = SfDataGridThemeData(
